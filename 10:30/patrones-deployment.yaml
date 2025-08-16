@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: patrones
+  labels:
+    app: patrones
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: patrones
+  template:
+    metadata:
+      labels:
+        app: patrones
+    spec:
+      containers:
+      - name: patrones
+        image: danielsabana/patrones:7.0.0
+        ports:
+        - containerPort: 8080
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MENSAJE
+            valueFrom:
+              configMapKeyRef:
+                name: patrones
+                key: mensajito
+        resources:
+          requests:
+            cpu: 100m
+            memory: 300Mi
+          limits: 
+            cpu: 900m
+            memory: 1500Mi
+        startupProbe:
+          httpGet:
+            path: /saludo
+            port: 8080
+          initialDelaySeconds: 10
